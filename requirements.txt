@@ -1,0 +1,6 @@
+flask
+gunicorn
+openai
+pdf2image
+Pillow
+requests
