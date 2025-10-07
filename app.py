@@ -16,6 +16,7 @@ OPENAI_API_KEY = os.getenv("OPEN_AI_KEY")
 MODEL = os.getenv("MODEL") 
 DPI = int(os.getenv("DPI"))
 MAX_PAGES = int(os.getenv("MAX_PAGES"))
+PORT = int(os.getenv("PORT", "8080"))
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 app = Flask(__name__)
@@ -177,4 +178,4 @@ def analyze():
         return jsonify({"ok": False, "error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=PORT)
