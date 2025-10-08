@@ -16,7 +16,7 @@ OPENAI_API_KEY = os.getenv("OPEN_AI_KEY")
 MODEL = os.getenv("MODEL") 
 DPI = int(os.getenv("DPI"))
 MAX_PAGES = int(os.getenv("MAX_PAGES"))
-PORT = int(os.getenv("PORT", "8080"))
+POPPLER_PATH = os.getenv("POPPLER_PATH")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 app = Flask(__name__)
@@ -30,10 +30,10 @@ def img_to_data_url(img: Image.Image) -> str:
 def pdf_to_data_urls(pdf_source, dpi: int = 250, limit: int | None = None) -> list[str]:
     if isinstance(pdf_source, (str, os.PathLike)):
         # specific file path
-        pages = convert_from_path(pdf_source, dpi=dpi)
+        pages = convert_from_path(pdf_source, dpi=dpi, poppler_path=POPPLER_PATH)
     else:
         # object in bytes
-        pages = convert_from_bytes(pdf_source.getvalue(), dpi=dpi)
+        pages = convert_from_bytes(pdf_source.getvalue(), dpi=dpi, poppler_path=POPPLER_PATH)
     if limit is not None:
         pages = pages[:limit]
     return [img_to_data_url(p.convert("RGB")) for p in pages]
@@ -178,4 +178,4 @@ def analyze():
         return jsonify({"ok": False, "error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=PORT)
+    app.run()
