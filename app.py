@@ -3,10 +3,10 @@ import json
 from io import BytesIO
 from pathlib import Path
 import time
-import argparse
 import os
 import requests
-from pdf2image import convert_from_path, convert_from_bytes
+import pypdfium2 as pdfium
+# from pdf2image import convert_from_path, convert_from_bytes
 from flask import Flask, request, jsonify
 from PIL import Image
 from openai import OpenAI
@@ -16,7 +16,6 @@ OPENAI_API_KEY = os.getenv("OPEN_AI_KEY")
 MODEL = os.getenv("MODEL") 
 DPI = int(os.getenv("DPI"))
 MAX_PAGES = int(os.getenv("MAX_PAGES"))
-POPPLER_PATH = os.getenv("POPPLER_PATH")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 app = Flask(__name__)
@@ -27,16 +26,42 @@ def img_to_data_url(img: Image.Image) -> str:
     b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
     return f"data:image/png;base64,{b64}"
 
-def pdf_to_data_urls(pdf_source, dpi: int = 250, limit: int | None = None) -> list[str]:
+# pdf2image + poppler
+# def pdf_to_data_urls(pdf_source, dpi: int = 250, limit: int | None = None) -> list[str]:
+#     if isinstance(pdf_source, (str, os.PathLike)):
+#         # specific file path
+#         pages = convert_from_path(pdf_source, dpi=dpi)
+#     else:
+#         # object in bytes
+#         pages = convert_from_bytes(pdf_source.getvalue(), dpi=dpi)
+#     if limit is not None:
+#         pages = pages[:limit]
+#     return [img_to_data_url(p.convert("RGB")) for p in pages]
+
+def pdf_to_data_urls(pdf_source, dpi, limit):
+    scale = float(dpi) / 72.0
+
+    # Load the document from path or memory
     if isinstance(pdf_source, (str, os.PathLike)):
-        # specific file path
-        pages = convert_from_path(pdf_source, dpi=dpi, poppler_path=POPPLER_PATH)
+        pdf = pdfium.PdfDocument(str(pdf_source))
+    elif isinstance(pdf_source, BytesIO):
+        pdf = pdfium.PdfDocument(pdf_source.getvalue())
+    elif isinstance(pdf_source, (bytes, bytearray)):
+        pdf = pdfium.PdfDocument(pdf_source)
     else:
-        # object in bytes
-        pages = convert_from_bytes(pdf_source.getvalue(), dpi=dpi, poppler_path=POPPLER_PATH)
-    if limit is not None:
-        pages = pages[:limit]
-    return [img_to_data_url(p.convert("RGB")) for p in pages]
+        raise TypeError("pdf_source must be a path (str/PathLike), BytesIO, or bytes")
+
+    total_pages = len(pdf)
+    pages_to_render = total_pages if limit is None else min(limit, total_pages)
+
+    data_urls = []
+    for i in range(pages_to_render):
+        page = pdf[i]
+        bitmap = page.render(scale=scale)
+        pil_img = bitmap.to_pil().convert("RGB")
+        data_urls.append(img_to_data_url(pil_img))
+
+    return data_urls
 
 def call_openai_with_images(image_urls: list[str]) -> dict:
     system_msg = "Ești un extractor de date din documente medicale. Returnează DOAR JSON valid."
