@@ -131,6 +131,10 @@ def parse_date(date_time_string):
         "%b %d, %Y",    # Oct 08, 2022
         "%B %d, %Y",    # October 08, 2022
         "%Y-%m-%d",     # 2022-10-08
+        "%d/%m/%Y",     # 08/10/2022
+        "%m/%d/%Y",     # 10/08/2022
+        "%d-%m-%Y",     # 08-10-2022
+        "%Y-%m-%d"      # 2022-10-08
     ):
         try:
             return datetime.strptime(date_time_string.strip(), date_time_format)
@@ -151,6 +155,8 @@ def create_dict_result(PATHS_URL):
     PATHS = fetch_document_links(PATHS_URL)
 
     for PATH in PATHS:
+        # need to avoid the rate limit
+        time.sleep(1)
         file = Path(PATH)
         result = dict()
         print(f"Starting OpenAI call for {PATH}")
@@ -184,7 +190,9 @@ def create_dict_result(PATHS_URL):
 
     openai_results_sorted = dict(sorted(
         openai_results.items(),
-        key=lambda item: parse_date(item[1].get("data_introducere_document", "")),
+        key=lambda item: parse_date(
+            item[1].get("data_introducere_document") or item[1].get("data_rezultat", "")
+        ),
         reverse=True
     ))
 
