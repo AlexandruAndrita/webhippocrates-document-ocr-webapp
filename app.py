@@ -99,7 +99,7 @@ def call_openai_with_images(image_urls: list[str]) -> dict:
         "Diagnosticul va aparea dupa cuvintele cheie: 'Diagnostic', 'Diagnosticul', 'Diagnostificat cu'\n\n"
 
         "- sumar_document"
-        "Un sumar al documentului, indicand eventualul tratament, diagnostic, analize si starea pacientului.\n\n"
+        "Genereaza un rezumat detaliat al documentului prezentand etapele de investigatie, analizele facute de pacient, starea pacientului, tratamentele care trebuie urmate si diagnosticul. Daca unul din termenii anteriori nu se regaseste in document, nu il mentiona. Rezumatul trebuie sa aiba maxim 500 de caractere.\n\n"
     )
 
     user_content = [{"type": "text", "text": instruction}]
@@ -131,6 +131,10 @@ def parse_date(date_time_string):
         "%b %d, %Y",    # Oct 08, 2022
         "%B %d, %Y",    # October 08, 2022
         "%Y-%m-%d",     # 2022-10-08
+        "%d/%m/%Y",     # 08/10/2022
+        "%m/%d/%Y",     # 10/08/2022
+        "%d-%m-%Y",     # 08-10-2022
+        "%Y-%m-%d"      # 2022-10-08
     ):
         try:
             return datetime.strptime(date_time_string.strip(), date_time_format)
@@ -181,10 +185,14 @@ def create_dict_result(PATHS_URL):
 
         end = time.time()
         print(f"Finished OpenAI call for {PATH}. Time taken {end - start:.2f} seconds")
+        # need to avoid the rate limit
+        time.sleep(1)
 
     openai_results_sorted = dict(sorted(
         openai_results.items(),
-        key=lambda item: parse_date(item[1].get("data_introducere_document", "")),
+        key=lambda item: parse_date(
+            item[1].get("data_introducere_document") or item[1].get("data_rezultat", "")
+        ),
         reverse=True
     ))
 
