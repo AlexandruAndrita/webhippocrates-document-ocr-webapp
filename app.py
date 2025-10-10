@@ -99,7 +99,7 @@ def call_openai_with_images(image_urls: list[str]) -> dict:
         "Diagnosticul va aparea dupa cuvintele cheie: 'Diagnostic', 'Diagnosticul', 'Diagnostificat cu'\n\n"
 
         "- sumar_document"
-        "Un sumar al documentului, indicand eventualul tratament, diagnostic, analize si starea pacientului.\n\n"
+        "Genereaza un rezumat detaliat al documentului prezentand etapele de investigatie, analizele facute de pacient, starea pacientului, tratamentele care trebuie urmate si diagnosticul. Daca unul din termenii anteriori nu se regaseste in document, nu il mentiona. Rezumatul trebuie sa aiba maxim 500 de caractere.\n\n"
     )
 
     user_content = [{"type": "text", "text": instruction}]
