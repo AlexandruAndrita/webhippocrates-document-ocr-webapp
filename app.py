@@ -155,8 +155,6 @@ def create_dict_result(PATHS_URL):
     PATHS = fetch_document_links(PATHS_URL)
 
     for PATH in PATHS:
-        # need to avoid the rate limit
-        time.sleep(1)
         file = Path(PATH)
         result = dict()
         print(f"Starting OpenAI call for {PATH}")
@@ -187,6 +185,8 @@ def create_dict_result(PATHS_URL):
 
         end = time.time()
         print(f"Finished OpenAI call for {PATH}. Time taken {end - start:.2f} seconds")
+        # need to avoid the rate limit
+        time.sleep(1)
 
     openai_results_sorted = dict(sorted(
         openai_results.items(),
