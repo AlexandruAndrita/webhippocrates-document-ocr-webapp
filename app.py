@@ -1,7 +1,7 @@
 import time
 from flask import Flask, request, jsonify
 
-from config import (FLASK_HOST, FLASK_PORT, FLASK_DEBUG, MAX_RETRIES, RETRY_DELAY, BATCH_SIZE)
+from config import (MAX_RETRIES, RETRY_DELAY, BATCH_SIZE)
 from batch_processor import create_dict_result
 from utils import fetch_document_links
 
@@ -69,5 +69,4 @@ def analyze():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
-    # app.run(debug=FLASK_DEBUG, host=FLASK_HOST, port=FLASK_PORT)
     app.run()
