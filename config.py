@@ -4,12 +4,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPEN_AI_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("MODEL")
 
 DPI = int(os.getenv("DPI"))
 MAX_PAGES = int(os.getenv("MAX_PAGES"))
-MAX_DOCUMENTS = int(os.getenv("MAX_DOCUMENTS"))
 
 REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT"))
 OPENAI_TIMEOUT = int(os.getenv("OPENAI_TIMEOUT"))

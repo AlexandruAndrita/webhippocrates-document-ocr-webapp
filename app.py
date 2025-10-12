@@ -9,7 +9,6 @@ app = Flask(__name__)
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    """Analyze documents using batch processing with retry mechanism"""
     data = request.get_json(silent=True) or {}
     paths_url = data.get("paths_url")
     if not paths_url:
