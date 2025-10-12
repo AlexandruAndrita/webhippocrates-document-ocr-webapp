@@ -4,3 +4,4 @@ openai
 pypdfium2>=4.30
 Pillow
 requests
+python-dotenv
