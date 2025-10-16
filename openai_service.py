@@ -32,7 +32,7 @@ def call_openai_with_images(image_urls: list[str]) -> dict:
         "Va returna `True` daca 'titlu_document' contine urmatoarele cuvinte cheie: 'Scrisoare medicala', 'Bilet de iesire din spital', 'Bilet de iesire', 'Bilet de externare'. Altfel, va returna `False`.\n\n"
 
         "- variabila_booleana_analize_medicale\n"
-        "Va returna `True` daca documentul contine urmatoarele cuvinte cheie: 'hemoglobina', 'hematocrit', 'hemoleucograma'. Altfel, va returna `False`.\n\n"
+        "Va returna `True` daca documentul contine urmatoarele cuvinte cheie: 'hemoglobina', 'hematocrit', 'hemoleucograma'. Daca niciun cuvant nu se gaseste explicit in document, va returna `False`.\n\n"
 
         "- variabila_booleana_examen_hispotatologic\n"
         "Va returna `True` daca documentul contine urmatoarele cuvinte cheie: 'histopatologica', 'histopatologic', 'microscopie', 'macroscopie', 'imunohistochimie', 'biopsie', 'biopsic', 'biopsice', 'OncoType', 'examen imunohistochimic', 'IHC', 'EHP'. Altfel, va returna `False`.\n\n"
@@ -51,8 +51,11 @@ def call_openai_with_images(image_urls: list[str]) -> dict:
         "- diagnostic_pacient\n"
         "Diagnosticul va aparea dupa cuvintele cheie: 'Diagnostic', 'Diagnosticul', 'Diagnostificat cu'\n\n"
 
+        "- rezultat_analize_medicale\n"
+        "Daca documentul contine urmatoarele cuvinte cheie: 'hemoglobina', 'hematocrit', 'hemoleucograma', extrage toate analizele medicale si valorile lor, in format tabelar, cu urmatoarele coloane: 'nume_analiza', 'valoare_masurata', 'unitate_de_masura', 'interval_de_referinta', 'data_analizei'. Fiecare analiza in parte trebuie sa fie returnata in format JSON. Daca una dintre analize contine mai multe subanalize, subanalizele trebuie incluse in analiza principala sub cheia 'subanaliza'. Daca documentul nu face parte din categoria Analize medicale, adica nu contine cuvintele cheie 'hemoglobina', 'hematocrit' sau 'hemoleucograma', returneaza null pentru acest camp. \n\n"
+
         "- sumar_document\n"
-        "Genereaza un rezumat detaliat al documentului prezentand etapele de investigatie, analizele facute de pacient, starea pacientului, tratamentele care trebuie urmate si diagnosticul. Daca unul din termenii anteriori nu se regaseste in document, nu il mentiona. Rezumatul trebuie sa aiba maxim 500 de caractere.\n\n"
+        "Genereaza un rezumat detaliat al documentului prezentand etapele de investigatie, analizele facute de pacient, starea pacientului, tratamentele care trebuie urmate si diagnosticul. Daca unul din termenii anteriori nu se regaseste in document, nu il mentiona. Rezumatul trebuie sa fie lung de 500 de caractere.\n\n"
     )
 
     user_content = [{"type": "text", "text": instruction}]  
